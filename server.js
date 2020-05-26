@@ -7,6 +7,7 @@ const fs = require('fs');
 
 const totalWords = wordList.length;
 const API_KEY = process.env.WORDNIK_API_KEY;
+console.log(`PROCESS PID: ${process.pid}`)
 
 const getUrl = (word) => {
     return `http://api.wordnik.com/v4/word.json/${word}/definitions?limit=3&includeRelated=true&useCanonical=false&includeTags=false&api_key=${API_KEY}`;   
