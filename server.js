@@ -55,7 +55,7 @@ function getRandomWord() {
 }
 
 // runs the job every 30 minutes
-const getMeaningJob = new CronJob('* */30 * * * *', getMeaningTask);
+const getMeaningJob = new CronJob('0 */30 * * * *', getMeaningTask);
 getMeaningJob.start();
 
 // write wordMeaningMap from in memory to file
@@ -68,5 +68,5 @@ function writeDataTask() {
 }
 
 // runs writeData task every morning 11AM
-const writeDataJob = new CronJob('* * 11 * * *', writeDataTask);
+const writeDataJob = new CronJob('0 * 11 * * *', writeDataTask);
 writeDataJob.start();
