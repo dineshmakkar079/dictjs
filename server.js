@@ -2,7 +2,7 @@ const axios = require('axios');
 const { exec } = require('child_process');
 const { CronJob }  = require('cron');
 const wordList = require('./words');
-const { formatString, capitalizeString } = require('./utils');
+const { convertArrayToString, capitalizeString } = require('./utils');
 const fs = require('fs');
 
 const totalWords = wordList.length;
@@ -27,17 +27,36 @@ fs.readFile('./wordMeaningMap.js', (err, data) => {
     }
 });
 
-function getMeaningTask() {
-    const word = getRandomWord().toLowerCase();
-    console.log(word);
-    const getMeaningPromise = !!wordMeaningMap[word] ? // if already fetched, use cached result
-        Promise.resolve({ data: wordMeaningMap[word] }) : 
-        axios.get(getUrl(word));
-    getMeaningPromise.
-    then((resp) => {
+async function getNewMeaning() {
+    let word = getRandomWord().toLowerCase();
+    let promise;
+    if (!!wordMeaningMap[word]) {
+        promise = Promise.resolve({ data: wordMeaningMap[word] });
+    } else {
+        try {
+            let resp = await axios.get(getUrl(word));
+            promise = Promise.resolve(resp);
+        } catch (e) {
+            console.log(`Failed API call for ${word} at ${(new Date())}`);
+            // select random from wordMeaningMap
+            let cachedWords = Object.keys(wordMeaningMap);
+            word = cachedWords[Math.floor((Math.random() * cachedWords.length )) || 0];
+            promise = Promise.resolve({ data: wordMeaningMap[word] });
+        }
+    }
+    return {
+        word,
+        promise
+    };
+}
+
+async function getMeaningTask() {
+    let { promise : getMeaningPromise, word } = await getNewMeaning();
+    getMeaningPromise = Promise.resolve(getMeaningPromise);
+    getMeaningPromise.then((resp) => {
         wordMeaningMap[word] = resp.data;
         let meanings = resp.data.map(el => el.text).filter(a => !!a);
-        meanings = formatString(meanings.join(" OR "));
+        meanings = convertArrayToString(meanings);
         const popupCommandString = `osascript -e 'display alert "${capitalizeString(word)}" message "${meanings}"'`;
         exec(popupCommandString);
     });
@@ -69,5 +88,5 @@ function writeDataTask() {
 }
 
 // runs writeData task every morning 11AM
-const writeDataJob = new CronJob('0 * 11 * * *', writeDataTask);
+const writeDataJob = new CronJob('0 0 11 * * *', writeDataTask);
 writeDataJob.start();

@@ -7,6 +7,12 @@ function formatString(str = "") {
     return str.replace(/(<\/.*>)/g, '').replace(/(<.*>)/g, '');
 }
 
+function convertArrayToString(arr = []) {
+    return arr.map((str, index) => {
+        return `${index+1}. ${formatString(str)}`
+    }).join('\n');
+}
+
 /**
  * This capitalizes the first letter of the string
  * @param {String} str | String to capitalize
@@ -19,6 +25,6 @@ function capitalizeString(str = "") {
 }
 
 module.exports = {
-    formatString,
-    capitalizeString
+    capitalizeString,
+    convertArrayToString
 };

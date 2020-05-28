@@ -1,1 +1,1 @@
-{}
+{"garner": [{"text": "To gather and store in a granary"},{"text": "To acquire or amass: synonym"},{"text": "A granary"}]}

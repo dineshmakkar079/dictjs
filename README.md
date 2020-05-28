@@ -9,7 +9,7 @@ to help you increase your vocabulary.
 4. Run command: ```chmod +x script.sh```, to make script executable
 5. Run the script as: ```./script.sh```
 
-Note: To stop this background process, go to vocab.log file, get the node PID and
+Note: To stop this background process, go to vocab.log file, look for ```PROCESS PID: XXXXX```
 run command: kill PID
 
 Example:
