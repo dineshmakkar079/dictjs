@@ -54,8 +54,8 @@ async function getMeaningTask() {
     let { promise : getMeaningPromise, word } = await getNewMeaning();
     getMeaningPromise = Promise.resolve(getMeaningPromise);
     getMeaningPromise.then((resp) => {
-        wordMeaningMap[word] = resp.data;
         let meanings = resp.data.map(el => el.text).filter(a => !!a);
+        wordMeaningMap[word] = meanings.map(meaning => ({text: meaning}));
         meanings = convertArrayToString(meanings);
         const popupCommandString = `osascript -e 'display alert "${capitalizeString(word)}" message "${meanings}"'`;
         exec(popupCommandString);
@@ -74,8 +74,8 @@ function getRandomWord() {
     }
 }
 
-// runs the job every 30 minutes
-const getMeaningJob = new CronJob('0 */30 * * * *', getMeaningTask);
+// runs the job every 20 minutes
+const getMeaningJob = new CronJob('0 */20 * * * *', getMeaningTask);
 getMeaningJob.start();
 
 // write wordMeaningMap from in memory to file
@@ -87,6 +87,6 @@ function writeDataTask() {
     });
 }
 
-// runs writeData task every morning 11AM
-const writeDataJob = new CronJob('0 0 11 * * *', writeDataTask);
+// runs writeData task every 6 hours
+const writeDataJob = new CronJob('0 0 */6 * * *', writeDataTask);
 writeDataJob.start();
